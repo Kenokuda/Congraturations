@@ -225,7 +225,7 @@ function renderResultScreen() {
   spawnResultConfetti();
 
   // Retry button
-  document.getElementById('retry-btn')!.addEventListener('click', startGame);
+  document.getElementById('retry-btn')!.addEventListener('click', resetGame);
 
   // Share button
   document.getElementById('share-btn')!.addEventListener('click', handleShare);
@@ -483,6 +483,21 @@ async function handleShare() {
       // Ignore
     }
   }
+}
+
+// ============================================
+// Reset
+// ============================================
+
+function resetGame() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  state = 'start';
+  score = 0;
+  timeLeft = GAME_DURATION;
+  renderApp();
 }
 
 // ============================================
