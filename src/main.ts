@@ -486,21 +486,6 @@ async function handleShare() {
 }
 
 // ============================================
-// Reset
-// ============================================
-
-function resetGame() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  state = 'start';
-  score = 0;
-  timeLeft = GAME_DURATION;
-  renderApp();
-}
-
-// ============================================
 // Init
 // ============================================
 
