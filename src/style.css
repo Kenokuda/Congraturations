@@ -165,10 +165,11 @@ html, body {
 }
 
 .start-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 15px;
+  color: var(--text-primary);
   line-height: 1.8;
-  max-width: 280px;
+  max-width: 300px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   animation: fadeInUp 1s var(--ease-out-expo) 0.6s both;
 }
 
@@ -540,7 +541,6 @@ html, body {
 }
 
 .retry-btn {
-  margin-top: var(--space-md);
   font-size: 14px;
   color: var(--gold-mid);
   background: rgba(232, 197, 109, 0.06);
@@ -559,6 +559,64 @@ html, body {
   transform: scale(0.96);
   background: rgba(232, 197, 109, 0.12);
   border-color: var(--gold-bright);
+}
+
+.back-btn {
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-accent);
+  letter-spacing: 0.1em;
+  padding: 8px 24px;
+  animation: fadeInUp 0.8s var(--ease-out-expo) 2.1s both;
+  transition: color 0.3s;
+}
+
+.back-btn:active {
+  color: var(--text-primary);
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+/* ============================================
+   Countdown
+   ============================================ */
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 11, 20, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+}
+
+.countdown-text {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(80px, 20vw, 120px);
+  color: var(--rose-soft);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.countdown-text.pop {
+  animation: countdownPop 0.5s var(--ease-out-back) forwards;
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  40% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* ============================================
