@@ -328,7 +328,7 @@ function spawnTapText(x: number, y: number) {
 
   const text = randomFrom(TAP_TEXTS);
   const color = randomFrom(TAP_COLORS);
-  const size = 14 + Math.random() * 14;
+  const size = 24 + Math.random() * 24;
   const rotation = -25 + Math.random() * 50;
 
   const el = document.createElement('div');
@@ -360,7 +360,7 @@ function spawnParticles(x: number, y: number) {
     const distance = 60 + Math.random() * 80;
     const dx = Math.cos(angle) * distance;
     const dy = Math.sin(angle) * distance - 30; // bias upward
-    const size = 14 + Math.random() * 12;
+    const size = 24 + Math.random() * 16;
 
     const el = document.createElement('div');
     el.className = 'particle';
