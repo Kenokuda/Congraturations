@@ -4,7 +4,7 @@ import './style.css';
 // Types
 // ============================================
 
-type AppState = 'start' | 'playing' | 'timeup' | 'result';
+type AppState = 'start' | 'countdown' | 'playing' | 'timeup' | 'result';
 
 // ============================================
 // Constants
@@ -48,6 +48,7 @@ const RESULT_MESSAGES = [
 let state: AppState = 'start';
 let score = 0;
 let timeLeft = GAME_DURATION;
+let hasPlayed = false;
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 let bumpTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -93,6 +94,9 @@ function renderApp() {
     case 'start':
       renderStartScreen();
       break;
+    case 'countdown':
+      renderCountdown();
+      break;
     case 'playing':
       renderPlayScreen();
       break;
@@ -116,7 +120,7 @@ function renderStartScreen() {
       <span class="accent">Wedding Celebration</span>
     </h1>
     <p class="start-subtitle">
-      10秒間タップして<br>ふたりにお祝いパワーを送ろう！
+      ${hasPlayed ? 'お祝いしてくれてありがとう！<br>もう一度お祝いパワーを送る？' : '10秒間タップして<br>ふたりにお祝いパワーを送ろう！'}
     </p>
     <button class="start-btn" id="start-btn">
       タップしてスタート！
@@ -127,7 +131,7 @@ function renderStartScreen() {
   document.getElementById('start-btn')!.addEventListener('click', startGame);
 }
 
-function renderPlayScreen() {
+function renderPlayScreen(autoStart = true) {
   const screen = document.createElement('div');
   screen.className = 'screen play-screen';
   screen.id = 'play-screen';
@@ -164,7 +168,9 @@ function renderPlayScreen() {
     handleTap(e.clientX, e.clientY);
   });
 
-  startTimer();
+  if (autoStart) {
+    startTimer();
+  }
 }
 
 function renderTimeup() {
@@ -217,15 +223,19 @@ function renderResultScreen() {
       </div>
       <div class="result-confetti" id="result-confetti"></div>
     </div>
-    <button class="retry-btn" id="retry-btn">もう一度お祝いする ↻</button>
+    <div class="result-actions">
+      <button class="retry-btn" id="retry-btn">もう一度お祝いする ↻</button>
+      <button class="back-btn" id="back-btn">スタート画面に戻る</button>
+    </div>
   `;
   appEl.appendChild(screen);
 
   // Confetti burst
   spawnResultConfetti();
 
-  // Retry button
-  document.getElementById('retry-btn')!.addEventListener('click', resetGame);
+  // Retry & Back buttons
+  document.getElementById('retry-btn')!.addEventListener('click', startGame);
+  document.getElementById('back-btn')!.addEventListener('click', backToStart);
 
   // Share button
   document.getElementById('share-btn')!.addEventListener('click', handleShare);
@@ -239,10 +249,58 @@ function renderResultScreen() {
 // ============================================
 
 function startGame() {
-  state = 'playing';
+  state = 'countdown';
   score = 0;
   timeLeft = GAME_DURATION;
   renderApp();
+}
+
+function renderCountdown() {
+  // Keep play screen visible behind
+  renderPlayScreen(false); // Render UI but don't start timer
+
+  const overlay = document.createElement('div');
+  overlay.className = 'countdown-overlay';
+  overlay.id = 'countdown-overlay';
+  
+  const numEl = document.createElement('div');
+  numEl.className = 'countdown-text';
+  overlay.appendChild(numEl);
+  appEl.appendChild(overlay);
+
+  let count = 3;
+  
+  function nextCount() {
+    if (count > 0) {
+      numEl.textContent = String(count);
+      numEl.classList.remove('pop');
+      void numEl.offsetWidth; // force reflow
+      numEl.classList.add('pop');
+      
+      // Haptic feedback
+      if (navigator.vibrate) navigator.vibrate(20);
+      
+      count--;
+      setTimeout(nextCount, 600);
+    } else {
+      // GO
+      numEl.textContent = 'GO!';
+      numEl.classList.remove('pop');
+      void numEl.offsetWidth;
+      numEl.classList.add('pop');
+      numEl.style.color = 'var(--gold-bright)';
+      
+      if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+      setTimeout(() => {
+        overlay.remove();
+        state = 'playing';
+        startTimer();
+      }, 500);
+    }
+  }
+
+  nextCount();
 }
 
 function startTimer() {
@@ -485,15 +543,12 @@ async function handleShare() {
   }
 }
 
-// ============================================
-// Reset
-// ============================================
-
-function resetGame() {
+function backToStart() {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+  hasPlayed = true;
   state = 'start';
   score = 0;
   timeLeft = GAME_DURATION;
